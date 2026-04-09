@@ -16,6 +16,8 @@
     <a href="/profile">Profile Lab</a>
     <a href="/character-hub">Character Hub</a>
     <a href="/matches">Realtime Sessions</a>
+    <a href="/friends-hub">Guild Chat + Video</a>
+    <a href="/skill-arena">Skill Arena</a>
     <a href="/leaderboard">Leaderboard</a>
     <a href="/logout" style="margin-left:auto; color:#ff8686;">Logout</a>
   </nav>
@@ -30,7 +32,7 @@
             <p class="stat">OFFERS <%= m.skillOffered %> | NEEDS <%= m.skillRequested %></p>
             <p class="stat">STATUS: <%= m.status %></p>
             <input id="msg-<%= m._id %>" placeholder="TYPE MESSAGE" />
-            <button onclick="sendMessage('<%= m._id %>')">SEND</button>
+            <button type="button" onclick="sendMessage('<%= m._id %>')">SEND</button>
             <div id="feed-<%= m._id %>" style="max-height:130px; overflow:auto;"></div>
           </div>
         <% }) %>
