@@ -6,8 +6,6 @@ const { analyzeGithub } = require('../services/githubAnalyzer');
 const { calculateBadges } = require('../services/xpEngine');
 const { resolveSkills } = require('../services/skillCatalog');
 const { ensureCharacterForUser } = require('../services/characterEngine');
-const { analyzeGithub } = require('../services/githubAnalyzer');
-const { calculateBadges } = require('../services/xpEngine');
 
 function signToken(user) {
   return jwt.sign({ id: user._id, email: user.email, name: user.name }, process.env.JWT_SECRET, {
@@ -37,9 +35,6 @@ async function register(req, res, next) {
       skillTags
     } = req.body;
 
-async function register(req, res, next) {
-  try {
-    const { name, email, password, githubUsername, portfolioLink } = req.body;
     if (!name || !email || !password) {
       return res.status(400).json({ message: 'name, email, and password are required.' });
     }
