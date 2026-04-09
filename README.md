@@ -24,7 +24,8 @@ StellaMatch is an AI-powered, gamified skill exchange platform for engineering s
 ## Run Locally
 1. Copy `.env.example` and configure secrets.
 2. Install dependencies: `npm install`
-3. Start server: `npm run dev` or `npm start`
+3. Seed dummy data (optional): `npm run seed:dummy`
+4. Start server: `npm run dev` or `npm start`
 
 ## Docker
 ```bash
@@ -33,6 +34,7 @@ docker compose up --build
 
 ## Notes
 - This project uses MongoDB for all app records (users, skills, friends, points, activity logs, matches, character data, resumes).
+
 
 ## Demo Data
 - On low-data startups, demo users are auto-seeded for showcase pages.

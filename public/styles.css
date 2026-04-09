@@ -122,6 +122,8 @@ button:hover { filter: brightness(1.2); }
   .grid-2, .grid-3 { grid-template-columns: 1fr; }
   .game-nav { flex-wrap: wrap; }
 }
+
+
 .sprite-runner {
   width: 96px;
   height: 64px;
