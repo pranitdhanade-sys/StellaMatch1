@@ -40,7 +40,8 @@
         <form method="POST" action="/skill-arena/battle">
           <input type="hidden" name="skill" value="<%= skill %>" />
           <select name="opponentId" required>
-            <option value="">Select Friend Opponent</option>
+            <option value="">Select Opponent</option>
+            <option value="robot">🤖 Robot</option>
             <% (user.friends || []).forEach((friend) => { %>
               <option value="<%= friend._id %>"><%= friend.name %></option>
             <% }) %>

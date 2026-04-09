@@ -38,7 +38,11 @@ async function seedQuizArena() {
 }
 
 async function getArenaQuestions(skill, limit = 5) {
-  return QuizQuestion.find({ skill }).limit(limit).lean();
+  const questions = await QuizQuestion.find({ skill }).limit(limit).lean();
+  if (questions.length > 0) return questions;
+
+  // fallback to default quiz questions if the chosen skill has no seeded content
+  return DEFAULT_QUESTIONS.filter((q) => q.skill === skill).slice(0, limit);
 }
 
 function scoreAnswers(questions, answers = []) {

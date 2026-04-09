@@ -1,3 +1,4 @@
+const bcrypt = require('bcrypt');
 const Match = require('../models/Match');
 const User = require('../models/User');
 const Skill = require('../models/Skill');
@@ -11,6 +12,40 @@ const { findMatches } = require('../services/matchmaker');
 const { resolveSkills } = require('../services/skillCatalog');
 const { ensureCharacterForUser, addProjectGrade } = require('../services/characterEngine');
 const { getArenaQuestions, scoreAnswers } = require('../services/skillArena');
+
+async function ensureFakeFriendsForPranit(user) {
+  if (String(user.email).toLowerCase() !== 'pranit.dhanade@gmail.com') return;
+  const fakeFriends = [
+    { name: 'Sage Nexus', email: 'sage.nexus@stellamatch.dev' },
+    { name: 'Nova Pixel', email: 'nova.pixel@stellamatch.dev' },
+    { name: 'Mira Spark', email: 'mira.spark@stellamatch.dev' }
+  ];
+
+  const hashed = await bcrypt.hash('demo1234', 10);
+  const friendIds = [];
+
+  for (const fake of fakeFriends) {
+    let friend = await User.findOne({ email: fake.email });
+    if (!friend) {
+      friend = await User.create({
+        name: fake.name,
+        email: fake.email,
+        password: hashed,
+        githubUsername: fake.email.split('@')[0],
+        city: 'Stella City',
+        skills: ['collaboration', 'game design'],
+        skillPoints: 50,
+        skillValue: 50,
+        xp: 120,
+        stellaPoints: 120,
+        badges: ['Guild Ally']
+      });
+    }
+    friendIds.push(friend._id);
+  }
+
+  await User.updateOne({ _id: user._id }, { $addToSet: { friends: { $each: friendIds } } });
+}
 
 async function renderDashboard(req, res, next) {
   try {
@@ -60,13 +95,18 @@ async function renderProfile(req, res, next) {
 
 async function updateProfile(req, res, next) {
   try {
-    const { portfolioLink, city, bio, skillTags } = req.body;
+    const { githubUsername, portfolioLink, city, bio, skillTags } = req.body;
     const user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ message: 'User not found' });
+
+    if (!githubUsername) {
+      return res.status(400).json({ message: 'GitHub username is required to keep your profile linked.' });
+    }
 
     const skillInput = Array.isArray(skillTags) ? skillTags : String(skillTags || '').split(',');
     const { skillDocs, skillPoints, skillLabels } = await resolveSkills(skillInput);
 
+    user.githubUsername = githubUsername;
     user.portfolioLink = portfolioLink || user.portfolioLink;
     user.city = city || user.city;
     user.bio = bio || user.bio;
@@ -207,6 +247,10 @@ async function acceptFriendRequest(req, res, next) {
 
 async function renderFriendsHub(req, res, next) {
   try {
+    const userFromDb = await User.findById(req.user.id);
+    if (!userFromDb) return res.redirect('/login');
+    await ensureFakeFriendsForPranit(userFromDb);
+
     const user = await User.findById(req.user.id).populate('friends', 'name city stellaPoints xp').lean();
     const selectedFriendId = req.query.friend || user.friends?.[0]?._id?.toString() || null;
 
@@ -273,16 +317,24 @@ async function renderSkillArena(req, res, next) {
       .limit(10)
       .lean();
 
+    // Prepare robot battle display and fallback for empty question sets
+    const normalizedBattles = recentBattles.map((battle) => {
+      if (!battle.opponent) battle.opponent = { name: '🤖 Robot' };
+      if (battle.isRobot && !battle.winner) {
+        battle.winner = battle.scoreChallenger >= battle.scoreOpponent ? battle.challenger : { name: '🤖 Robot' };
+      }
+      return battle;
+    });
+
     return res.render('skillArena', {
       user,
       skill,
       questions,
-      recentBattles
+      recentBattles: normalizedBattles
     });
   } catch (error) {
     return next(error);
   }
-}
 
 async function battleInSkillArena(req, res, next) {
   try {
@@ -293,15 +345,26 @@ async function battleInSkillArena(req, res, next) {
       : Object.keys(rawAnswers).sort((a, b) => Number(a) - Number(b)).map((k) => rawAnswers[k]);
 
     const user = await User.findById(req.user.id);
-    const opponent = await User.findById(opponentId);
-    if (!user || !opponent) return res.status(404).json({ message: 'Player not found' });
+    if (!user) return res.status(404).json({ message: 'Player not found' });
+
+    let opponent = null;
+    let opponentScore = 0;
+    let isRobot = false;
+
+    if (opponentId === 'robot') {
+      isRobot = true;
+      opponentScore = Math.floor(Math.random() * 6); // 0-5
+    } else {
+      opponent = await User.findById(opponentId);
+      if (!opponent) return res.status(404).json({ message: 'Opponent not found' });
+      opponentScore = Math.floor(Math.random() * (answers.length + 1));
+    }
 
     const questions = await getArenaQuestions(String(skill || 'javascript').toLowerCase(), 5);
     const challengerScore = scoreAnswers(questions, answers);
-    const opponentScore = Math.floor(Math.random() * (questions.length + 1));
-    const winner = challengerScore >= opponentScore ? user : opponent;
+    const winner = challengerScore > opponentScore ? user : (isRobot ? null : opponent);
     const xpAwarded = challengerScore * 15;
-    const stellaAwarded = challengerScore >= opponentScore ? 10 : 3;
+    const stellaAwarded = challengerScore > opponentScore ? 10 : 3;
 
     user.xp += xpAwarded;
     user.stellaPoints += stellaAwarded;
@@ -310,11 +373,11 @@ async function battleInSkillArena(req, res, next) {
 
     await QuizBattle.create({
       challenger: user._id,
-      opponent: opponent._id,
+      opponent: isRobot ? null : opponent._id,
       skill,
       scoreChallenger: challengerScore,
       scoreOpponent: opponentScore,
-      winner: winner._id,
+      winner: winner ? winner._id : null,
       xpAwarded,
       stellaAwarded
     });
@@ -324,7 +387,7 @@ async function battleInSkillArena(req, res, next) {
       action: 'skill_arena_battle',
       method: 'POST',
       path: '/skill-arena/battle',
-      metadata: { opponentId, skill, challengerScore, opponentScore, xpAwarded, stellaAwarded }
+      metadata: { opponentId: isRobot ? 'robot' : opponentId, skill, challengerScore, opponentScore, xpAwarded, stellaAwarded }
     });
 
     return res.redirect(`/skill-arena?skill=${encodeURIComponent(skill)}`);
