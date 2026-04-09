@@ -26,6 +26,7 @@ app.use(cookieParser());
 app.use(optionalAuth);
 app.use('/public', express.static(path.join(__dirname, 'public')));
 app.use('/resumes', express.static(path.join(__dirname, 'resumes')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use(authRoutes);
 app.use(viewRoutes);

@@ -105,7 +105,7 @@ async function renderLeaderboard(req, res, next) {
     const users = await User.find({})
       .sort({ xp: -1 })
       .limit(50)
-      .select('name githubUsername xp badges skillValue level city')
+      .select('name githubUsername xp badges skillValue level')
       .lean();
 
     return res.render('leaderboard', { users });

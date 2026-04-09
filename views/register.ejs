@@ -46,8 +46,12 @@
       const fd = new FormData(form);
       const res = await fetch('/register', { method: 'POST', body: fd });
       const data = await res.json();
-      if (res.ok) window.location.href = '/dashboard';
-      else msg.textContent = data.message || 'REGISTRATION FAILED';
+      if (res.ok) {
+        window.location.href = '/dashboard';
+      } else {
+        msg.className = 'text-red-600 text-sm';
+        msg.textContent = data.message || 'Registration failed';
+      }
     });
   </script>
 </body>
