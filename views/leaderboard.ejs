@@ -58,6 +58,9 @@
             <td><%= u.stellaPoints || 0 %></td>
             <td><%= u.skillValue || 0 %></td>
             <td><%= (u.friends || []).length %></td>
+            <td><%= u.skillValue || 0 %></td>
+            <td><%= u.level || 'Beginner' %></td>
+            <td><%= (u.badges || []).join(', ') || '-' %></td>
           </tr>
           <% }) %>
         </tbody>
