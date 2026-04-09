@@ -3,25 +3,40 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <script src="https://cdn.tailwindcss.com"></script>
-  <title>Register | StellaMatch</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/public/styles.css" />
+  <title>StellaMatch :: Register</title>
 </head>
-<body class="bg-slate-100 min-h-screen py-8">
-  <div class="max-w-2xl mx-auto bg-white p-8 rounded-xl shadow">
-    <h1 class="text-2xl font-bold mb-6">Create StellaMatch Account</h1>
-    <form id="registerForm" class="space-y-4" enctype="multipart/form-data">
-      <input class="w-full border rounded p-2" name="name" placeholder="Full Name" required />
-      <input class="w-full border rounded p-2" name="email" type="email" placeholder="Email" required />
-      <input class="w-full border rounded p-2" name="password" type="password" placeholder="Password" required />
-      <input class="w-full border rounded p-2" name="githubUsername" placeholder="GitHub Username" />
-      <input class="w-full border rounded p-2" name="portfolioLink" placeholder="Portfolio URL" />
-      <label class="block text-sm font-medium">Resume (PDF)</label>
-      <input class="w-full border rounded p-2" name="resume" type="file" accept="application/pdf" />
-      <button class="w-full bg-indigo-600 text-white py-2 rounded">Register</button>
-      <p class="text-sm">Already have account? <a class="text-indigo-600" href="/login">Login</a></p>
-      <p id="msg" class="text-sm"></p>
-    </form>
-  </div>
+<body>
+  <main class="game-shell" style="max-width:960px;">
+    <section class="panel">
+      <h1 class="hero-title">CREATE PLAYER PROFILE</h1>
+      <p class="subtitle">Tag your skills for point-based matching. Resume files are saved in /resumes and indexed in MongoDB.</p>
+      <form id="registerForm" enctype="multipart/form-data">
+        <div class="grid-2">
+          <div>
+            <input name="name" placeholder="FULL NAME" required />
+            <input name="email" type="email" placeholder="EMAIL" required />
+            <input name="password" type="password" placeholder="PASSWORD" required />
+            <input name="city" placeholder="CITY" />
+            <input name="githubUsername" placeholder="GITHUB USERNAME" />
+            <input name="portfolioLink" placeholder="PORTFOLIO LINK" />
+          </div>
+          <div>
+            <textarea name="bio" placeholder="SHORT BIO" rows="5"></textarea>
+            <input name="skillTags" placeholder="SKILL TAGS (comma separated, e.g. python,javascript,node.js)" />
+            <label class="subtitle">UPLOAD RESUME (PDF)</label>
+            <input name="resume" type="file" accept="application/pdf" />
+            <button type="submit">SPAWN CHARACTER</button>
+          </div>
+        </div>
+        <p class="subtitle">Already have profile? <a href="/login">LOGIN</a></p>
+        <p id="msg" class="subtitle"></p>
+      </form>
+    </section>
+  </main>
 
   <script>
     const form = document.getElementById('registerForm');

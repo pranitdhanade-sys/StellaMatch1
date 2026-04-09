@@ -7,8 +7,13 @@ const UserSchema = new mongoose.Schema(
     password: { type: String, required: true },
     githubUsername: { type: String, default: '' },
     portfolioLink: { type: String, default: '' },
+    city: { type: String, default: '' },
+    bio: { type: String, default: '' },
     resumePath: { type: String, default: '' },
+    resume: { type: mongoose.Schema.Types.ObjectId, ref: 'Resume', default: null },
     skills: { type: [String], default: [] },
+    skillTags: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Skill' }],
+    skillPoints: { type: Number, default: 0, min: 0 },
     skillValue: { type: Number, default: 0, min: 0, max: 100 },
     level: {
       type: String,
@@ -17,6 +22,7 @@ const UserSchema = new mongoose.Schema(
     },
     xp: { type: Number, default: 0, min: 0 },
     badges: { type: [String], default: [] },
+    character: { type: mongoose.Schema.Types.ObjectId, ref: 'Character', default: null },
     lastGithubActivityAt: { type: Date, default: null },
     createdAt: { type: Date, default: Date.now }
   },

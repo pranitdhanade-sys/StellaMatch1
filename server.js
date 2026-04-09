@@ -11,6 +11,7 @@ const viewRoutes = require('./routes/viewRoutes');
 const { optionalAuth } = require('./middleware/auth');
 const sessionSocket = require('./socket/sessionSocket');
 const { startAgenticMatchCron } = require('./services/cronJobs');
+const { seedSkillCatalog } = require('./services/skillCatalog');
 
 const app = express();
 const server = http.createServer(app);
@@ -24,6 +25,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(optionalAuth);
 app.use('/public', express.static(path.join(__dirname, 'public')));
+app.use('/resumes', express.static(path.join(__dirname, 'resumes')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use(authRoutes);
@@ -41,6 +43,7 @@ const PORT = process.env.PORT || 3000;
 
 async function start() {
   await connectDB();
+  await seedSkillCatalog();
   startAgenticMatchCron();
   server.listen(PORT, () => {
     console.log(`StellaMatch running on http://localhost:${PORT}`);

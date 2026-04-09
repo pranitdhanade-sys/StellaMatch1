@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/public/styles.css" />
+  <title>StellaMatch :: Character Hub</title>
+</head>
+<body>
+  <nav class="game-nav">
+    <a href="/dashboard">Dashboard</a>
+    <a href="/profile">Profile Lab</a>
+    <a href="/character-hub">Character Hub</a>
+    <a href="/matches">Realtime Sessions</a>
+    <a href="/leaderboard">Leaderboard</a>
+    <a href="/logout" style="margin-left:auto; color:#ff8686;">Logout</a>
+  </nav>
+
+  <main class="game-shell grid-2">
+    <section class="panel">
+      <h1 class="hero-title">CHARACTER HUB</h1>
+      <div style="display:flex; gap:16px; align-items:center;">
+        <div class="pixel-sprite"></div>
+        <div>
+          <p class="stat">ALIAS: <%= character.alias %></p>
+          <p class="stat">CLASS: <%= character.classType %></p>
+          <p class="stat">CHARACTER LEVEL: <%= character.level %></p>
+          <p class="stat">PROJECT XP: <%= character.totalProjectXp %></p>
+        </div>
+      </div>
+      <h3 class="subtitle">INVENTORY</h3>
+      <% (character.inventory || []).forEach((item) => { %><span class="badge"><%= item %></span><% }) %>
+    </section>
+
+    <section class="panel">
+      <h2 class="hero-title" style="font-size:14px;">PROJECT QUEST LOG</h2>
+      <div style="max-height:380px; overflow:auto;">
+      <% if (!character.projectGrades.length) { %>
+        <p class="subtitle">No graded projects yet. Use Project Grader on dashboard.</p>
+      <% } %>
+      <% character.projectGrades.slice().reverse().forEach((quest) => { %>
+        <div class="panel" style="padding:10px; margin-bottom:10px;">
+          <p class="stat"><%= quest.title %></p>
+          <p class="stat">Difficulty: <%= quest.difficulty %> | Size: <%= quest.size %></p>
+          <p class="stat">XP Awarded: <%= quest.xpAwarded %></p>
+        </div>
+      <% }) %>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

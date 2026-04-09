@@ -1,6 +1,11 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const Resume = require('../models/Resume');
+const { analyzeGithub } = require('../services/githubAnalyzer');
+const { calculateBadges } = require('../services/xpEngine');
+const { resolveSkills } = require('../services/skillCatalog');
+const { ensureCharacterForUser } = require('../services/characterEngine');
 const { analyzeGithub } = require('../services/githubAnalyzer');
 const { calculateBadges } = require('../services/xpEngine');
 
@@ -9,6 +14,28 @@ function signToken(user) {
     expiresIn: process.env.JWT_EXPIRES_IN || '7d'
   });
 }
+
+function parseSkillInput(rawSkills) {
+  if (!rawSkills) return [];
+  if (Array.isArray(rawSkills)) return rawSkills;
+  return String(rawSkills)
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
+async function register(req, res, next) {
+  try {
+    const {
+      name,
+      email,
+      password,
+      githubUsername,
+      portfolioLink,
+      city,
+      bio,
+      skillTags
+    } = req.body;
 
 async function register(req, res, next) {
   try {
@@ -20,8 +47,10 @@ async function register(req, res, next) {
     const exists = await User.findOne({ email });
     if (exists) return res.status(409).json({ message: 'Email already registered.' });
 
+    const parsedSkills = parseSkillInput(skillTags);
+    const { skillDocs, skillPoints, skillLabels } = await resolveSkills(parsedSkills);
     const hashed = await bcrypt.hash(password, 12);
-    const resumePath = req.file ? `/uploads/${req.file.filename}` : '';
+    const resumePath = req.file ? `/resumes/${req.file.filename}` : '';
 
     const user = await User.create({
       name,
@@ -29,15 +58,32 @@ async function register(req, res, next) {
       password: hashed,
       githubUsername: githubUsername || '',
       portfolioLink: portfolioLink || '',
+      city: city || '',
+      bio: bio || '',
       resumePath,
+      skills: skillLabels,
+      skillTags: skillDocs.map((s) => s._id),
+      skillPoints,
       xp: 5,
       badges: calculateBadges(5)
     });
 
+    if (req.file) {
+      const resume = await Resume.create({
+        user: user._id,
+        originalName: req.file.originalname,
+        storedName: req.file.filename,
+        path: resumePath,
+        mimeType: req.file.mimetype,
+        size: req.file.size
+      });
+      user.resume = resume._id;
+    }
+
     if (githubUsername) {
       try {
         const analysis = await analyzeGithub(githubUsername);
-        user.skills = analysis.skills;
+        user.skills = [...new Set([...user.skills, ...analysis.skills])];
         user.skillValue = analysis.skillValue;
         user.level = analysis.level;
         user.lastGithubActivityAt = analysis.metadata.recentActivityDays >= 0
@@ -48,6 +94,10 @@ async function register(req, res, next) {
         console.warn('GitHub analysis failed on registration:', error.message);
       }
     }
+
+    const character = await ensureCharacterForUser(user);
+    user.character = character._id;
+    await user.save();
 
     const token = signToken(user);
     res.cookie('token', token, { httpOnly: true, sameSite: 'lax' });
