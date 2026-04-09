@@ -84,10 +84,7 @@ async function register(req, res, next) {
         user.lastGithubActivityAt = analysis.metadata.recentActivityDays >= 0
           ? new Date(Date.now() - analysis.metadata.recentActivityDays * 24 * 60 * 60 * 1000)
           : null;
-<<<<<<< HEAD
         await user.save();
-=======
->>>>>>> origin/codex/build-full-stack-node.js-web-app-stellamatch-s2xgb2
       } catch (error) {
         console.warn('GitHub analysis failed on registration:', error.message);
       }

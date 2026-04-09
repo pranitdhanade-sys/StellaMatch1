@@ -48,15 +48,7 @@
       const data = await res.json();
       if (res.ok) window.location.href = '/dashboard';
       else msg.textContent = data.message || 'REGISTRATION FAILED';
-<<<<<<< HEAD
-      if (res.ok) {
-        window.location.href = '/dashboard';
-      } else {
-        msg.className = 'text-red-600 text-sm';
-        msg.textContent = data.message || 'Registration failed';
-      }
-=======
->>>>>>> origin/codex/build-full-stack-node.js-web-app-stellamatch-s2xgb2
+
     });
   </script>
 </body>

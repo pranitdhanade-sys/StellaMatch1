@@ -33,11 +33,7 @@ docker compose up --build
 
 ## Notes
 - This project uses MongoDB for all app records (users, skills, friends, points, activity logs, matches, character data, resumes).
-<<<<<<< HEAD
-=======
-
 
 ## Demo Data
 - On low-data startups, demo users are auto-seeded for showcase pages.
 - Demo password for seeded accounts: `demo1234`.
->>>>>>> origin/codex/build-full-stack-node.js-web-app-stellamatch-s2xgb2
