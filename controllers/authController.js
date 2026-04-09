@@ -84,6 +84,7 @@ async function register(req, res, next) {
         user.lastGithubActivityAt = analysis.metadata.recentActivityDays >= 0
           ? new Date(Date.now() - analysis.metadata.recentActivityDays * 24 * 60 * 60 * 1000)
           : null;
+        await user.save();
       } catch (error) {
         console.warn('GitHub analysis failed on registration:', error.message);
       }

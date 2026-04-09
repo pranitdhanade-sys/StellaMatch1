@@ -43,6 +43,7 @@
       const data = await res.json();
       if (res.ok) window.location.href = '/dashboard';
       else msg.textContent = data.message || 'LOGIN FAILED';
+
     });
   </script>
 </body>

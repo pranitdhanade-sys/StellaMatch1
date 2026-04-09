@@ -11,13 +11,21 @@ function getToken(req) {
 function requireAuth(req, res, next) {
   try {
     const token = getToken(req);
-    if (!token) return res.status(401).json({ message: 'Unauthorized' });
+    if (!token) {
+      if (req.headers.accept && req.headers.accept.includes('text/html')) {
+        return res.redirect('/login');
+      }
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
 
     const payload = jwt.verify(token, process.env.JWT_SECRET);
     req.user = payload;
     res.locals.currentUser = payload;
     return next();
   } catch (error) {
+    if (req.headers.accept && req.headers.accept.includes('text/html')) {
+      return res.redirect('/login');
+    }
     return res.status(401).json({ message: 'Invalid or expired token' });
   }
 }

@@ -29,13 +29,13 @@
     </section>
 
     <section class="grid-2">
-      <article class="panel">
-        <h1 class="hero-title">SKILL TESTING ARENA</h1>
-        <p class="subtitle">Challenge a friend in a quiz duel. Earn XP + Stella coins for victory!</p>
-        <form method="GET" action="/skill-arena">
-          <input name="skill" value="<%= skill %>" placeholder="skill e.g. javascript" />
-          <button type="submit">LOAD QUIZ QUEST</button>
-        </form>
+    <section class="panel">
+      <h1 class="hero-title">SKILL TESTING ARENA</h1>
+      <p class="subtitle">Challenge a friend in a quiz duel. Earn XP + Stella coins for victory!</p>
+      <form method="GET" action="/skill-arena">
+        <input name="skill" value="<%= skill %>" placeholder="skill e.g. javascript" />
+        <button type="submit">LOAD QUIZ QUEST</button>
+      </form>
 
         <form method="POST" action="/skill-arena/battle">
           <input type="hidden" name="skill" value="<%= skill %>" />
@@ -60,9 +60,9 @@
 
           <button type="submit">BATTLE NOW</button>
         </form>
-      </article>
+      </section>
 
-      <article class="panel">
+      <section class="panel">
         <h2 class="hero-title" style="font-size:14px;">RECENT DUELS</h2>
         <% if (!recentBattles.length) { %><p class="subtitle">No battles yet. Start your first duel.</p><% } %>
         <% recentBattles.forEach((battle) => { %>
@@ -73,7 +73,7 @@
             <p class="stat">Rewards: +<%= battle.xpAwarded %> XP, +<%= battle.stellaAwarded %> Stella</p>
           </div>
         <% }) %>
-      </article>
+      </section>
     </section>
   </main>
 </body>

@@ -108,6 +108,7 @@
 
     <section class="panel" style="margin-top:16px;">
       <h2 class="hero-title" style="font-size:14px;">STELLA TREASURE LEDGER</h2>
+
       <% if (!stellaTransactions.length) { %><p class="subtitle">No point transfers yet.</p><% } %>
       <% stellaTransactions.forEach((tx) => { %>
         <p class="stat">
@@ -159,5 +160,6 @@
       });
     }
   </script>
+
 </body>
 </html>

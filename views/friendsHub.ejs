@@ -29,20 +29,20 @@
     </section>
 
     <section class="grid-2">
-      <article class="panel">
-        <h1 class="hero-title">GUILD FRIEND CHANNELS</h1>
-        <% if (!(user.friends || []).length) { %>
-          <p class="subtitle">No guild allies yet. Accept requests on dashboard to unlock chat + video.</p>
-        <% } %>
-        <% (user.friends || []).forEach((friend) => { %>
-          <p class="stat">
-            <a href="/friends-hub?friend=<%= friend._id %>"><%= friend.name %></a>
-            | XP <%= friend.xp %> | SP <%= friend.stellaPoints %>
-          </p>
-        <% }) %>
-      </article>
+    <section class="panel">
+      <h1 class="hero-title">GUILD FRIEND CHANNELS</h1>
+      <% if (!(user.friends || []).length) { %>
+        <p class="subtitle">No guild allies yet. Accept requests on dashboard to unlock chat + video.</p>
+      <% } %>
+      <% (user.friends || []).forEach((friend) => { %>
+        <p class="stat">
+          <a href="/friends-hub?friend=<%= friend._id %>"><%= friend.name %></a>
+          | XP <%= friend.xp %> | SP <%= friend.stellaPoints %>
+        </p>
+      <% }) %>
+    </section>
 
-      <article class="panel">
+      <section class="panel">
         <% if (selectedFriend) { %>
           <h2 class="hero-title" style="font-size:14px;">CHAT WITH <%= selectedFriend.name %></h2>
           <div style="max-height:220px; overflow:auto; margin-bottom:10px;">
@@ -67,7 +67,7 @@
         <% } else { %>
           <p class="subtitle">Pick a friend to open chat + video room.</p>
         <% } %>
-      </article>
+      </section>
     </section>
   </main>
 </body>

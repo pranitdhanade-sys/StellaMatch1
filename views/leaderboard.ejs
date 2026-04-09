@@ -22,7 +22,6 @@
   </nav>
 
   <main class="game-shell">
-
     <section class="panel" style="margin-bottom:16px;">
       <h2 class="hero-title" style="font-size:14px;">YOUR HERO PROFILE</h2>
       <p class="stat">Name: <%= currentUser?.name || 'Unknown' %></p>
@@ -66,6 +65,7 @@
             <td><%= u.stellaPoints || 0 %></td>
             <td><%= u.skillValue || 0 %></td>
             <td><%= (u.friends || []).length %></td>
+
           </tr>
           <% }) %>
         </tbody>
