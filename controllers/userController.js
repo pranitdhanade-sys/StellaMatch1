@@ -19,6 +19,7 @@ async function renderDashboard(req, res, next) {
       .populate('skillTags')
       .populate('friends', 'name city skillValue xp stellaPoints')
       .lean();
+    if (!user) return res.redirect('/login');
     const suggested = await findMatches(req.user.id);
     const incomingFriendRequests = await FriendRequest.find({ toUser: req.user.id, status: 'pending' })
       .populate('fromUser', 'name city')
