@@ -45,6 +45,11 @@
 
     socket.on('session_message', ({ roomId, message, senderId, at }) => {
       const feed = document.getElementById(`feed-${roomId}`);
+      if (!feed) return;
+      const p = document.createElement('p');
+      p.className = 'stat';
+      p.textContent = `[${new Date(at).toLocaleTimeString()}] ${senderId}: ${message}`;
+      feed.prepend(p);
       if (feed) {
         const p = document.createElement('p');
         p.textContent = `[${new Date(at).toLocaleTimeString()}] ${senderId}: ${message}`;

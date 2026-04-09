@@ -12,6 +12,7 @@ const { optionalAuth } = require('./middleware/auth');
 const sessionSocket = require('./socket/sessionSocket');
 const { startAgenticMatchCron } = require('./services/cronJobs');
 const { seedSkillCatalog } = require('./services/skillCatalog');
+const activityLogger = require('./middleware/activityLogger');
 
 const app = express();
 const server = http.createServer(app);
@@ -26,6 +27,7 @@ app.use(cookieParser());
 app.use(optionalAuth);
 app.use('/public', express.static(path.join(__dirname, 'public')));
 app.use('/resumes', express.static(path.join(__dirname, 'resumes')));
+app.use(activityLogger);
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use(authRoutes);

@@ -21,6 +21,9 @@ const UserSchema = new mongoose.Schema(
       default: 'Beginner'
     },
     xp: { type: Number, default: 0, min: 0 },
+    stellaPoints: { type: Number, default: 100, min: 0 },
+    badges: { type: [String], default: [] },
+    friends: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     badges: { type: [String], default: [] },
     character: { type: mongoose.Schema.Types.ObjectId, ref: 'Character', default: null },
     lastGithubActivityAt: { type: Date, default: null },

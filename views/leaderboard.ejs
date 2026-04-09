@@ -22,9 +22,30 @@
   <main class="game-shell">
     <section class="panel">
       <h1 class="hero-title">TOP 50 CITY ENGINEER PLAYERS</h1>
+      <form method="GET" action="/leaderboard" class="grid-2">
+        <div>
+          <label class="subtitle">SORT BY</label>
+          <select name="sortBy">
+            <option value="xp" <%= sortBy === 'xp' ? 'selected' : '' %>>XP</option>
+            <option value="skillPoints" <%= sortBy === 'skillPoints' ? 'selected' : '' %>>Skill Points</option>
+            <option value="stellaPoints" <%= sortBy === 'stellaPoints' ? 'selected' : '' %>>Stella Points</option>
+          </select>
+        </div>
+        <div>
+          <label class="subtitle">CITY FILTER</label>
+          <select name="city">
+            <option value="">All Cities</option>
+            <% allCities.forEach((cityOption) => { %>
+              <option value="<%= cityOption %>" <%= city === cityOption ? 'selected' : '' %>><%= cityOption %></option>
+            <% }) %>
+          </select>
+        </div>
+        <button type="submit">APPLY FILTERS</button>
+      </form>
+
       <table class="table">
         <thead>
-          <tr><th>Rank</th><th>Name</th><th>City</th><th>XP</th><th>Skill Value</th><th>Level</th><th>Badges</th></tr>
+          <tr><th>Rank</th><th>Name</th><th>City</th><th>XP</th><th>Skill Points</th><th>Stella Points</th><th>Skill Value</th><th>Friends</th></tr>
         </thead>
         <tbody>
           <% users.forEach((u, idx) => { %>
@@ -33,6 +54,10 @@
             <td><%= u.name %></td>
             <td><%= u.city || '-' %></td>
             <td><%= u.xp %></td>
+            <td><%= u.skillPoints || 0 %></td>
+            <td><%= u.stellaPoints || 0 %></td>
+            <td><%= u.skillValue || 0 %></td>
+            <td><%= (u.friends || []).length %></td>
             <td><%= u.skillValue || 0 %></td>
             <td><%= u.level || 'Beginner' %></td>
             <td><%= (u.badges || []).join(', ') || '-' %></td>
