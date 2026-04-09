@@ -122,3 +122,28 @@ button:hover { filter: brightness(1.2); }
   .grid-2, .grid-3 { grid-template-columns: 1fr; }
   .game-nav { flex-wrap: wrap; }
 }
+<<<<<<< HEAD
+=======
+
+
+.sprite-runner {
+  width: 96px;
+  height: 64px;
+  border: 3px solid #fff;
+  background: linear-gradient(90deg, #ff62d8 0 25%, #52f7d4 25% 50%, #ffd166 50% 75%, #52f7d4 75% 100%);
+  background-size: 192px 64px;
+  animation: run-sprite 0.8s steps(2) infinite;
+}
+
+@keyframes run-sprite {
+  from { background-position: 0 0; }
+  to { background-position: -192px 0; }
+}
+
+@media (max-width: 640px) {
+  .hero-title { font-size: 15px; }
+  .stat { font-size: 9px; }
+  input, textarea, select, button { font-size: 9px; padding: 8px; }
+  .panel { padding: 12px; }
+}
+>>>>>>> origin/codex/build-full-stack-node.js-web-app-stellamatch-s2xgb2

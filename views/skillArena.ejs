@@ -18,7 +18,18 @@
     <a href="/logout" style="margin-left:auto; color:#ff8686;">Logout</a>
   </nav>
 
+<<<<<<< HEAD
   <main class="game-shell grid-2">
+=======
+  <main class="game-shell">
+    <section class="panel" style="margin-bottom:16px;">
+      <h2 class="hero-title" style="font-size:14px;">PLAYER HUD</h2>
+      <p class="stat">Hero: <%= user.name %></p>
+      <p class="stat">XP: <%= user.xp || 0 %> | Stella: <%= user.stellaPoints || 0 %> | Allies: <%= (user.friends || []).length %></p>
+    </section>
+
+    <section class="grid-2">
+>>>>>>> origin/codex/build-full-stack-node.js-web-app-stellamatch-s2xgb2
     <section class="panel">
       <h1 class="hero-title">SKILL TESTING ARENA</h1>
       <p class="subtitle">Challenge a friend in a quiz duel. Earn XP + Stella coins for victory!</p>
@@ -64,6 +75,10 @@
         </div>
       <% }) %>
     </section>
+<<<<<<< HEAD
+=======
+      </section>
+>>>>>>> origin/codex/build-full-stack-node.js-web-app-stellamatch-s2xgb2
   </main>
 </body>
 </html>

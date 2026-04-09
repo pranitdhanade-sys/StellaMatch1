@@ -20,6 +20,15 @@
   </nav>
 
   <main class="game-shell">
+<<<<<<< HEAD
+=======
+
+    <section class="panel" style="margin-bottom:16px;">
+      <h2 class="hero-title" style="font-size:14px;">YOUR HERO PROFILE</h2>
+      <p class="stat">Name: <%= currentUser?.name || 'Unknown' %></p>
+      <p class="stat">XP: <%= currentUser?.xp || 0 %> | Skill Points: <%= currentUser?.skillPoints || 0 %> | Stella: <%= currentUser?.stellaPoints || 0 %></p>
+    </section>
+>>>>>>> origin/codex/build-full-stack-node.js-web-app-stellamatch-s2xgb2
     <section class="panel">
       <h1 class="hero-title">TOP 50 CITY ENGINEER PLAYERS</h1>
       <form method="GET" action="/leaderboard" class="grid-2">
@@ -58,9 +67,12 @@
             <td><%= u.stellaPoints || 0 %></td>
             <td><%= u.skillValue || 0 %></td>
             <td><%= (u.friends || []).length %></td>
+<<<<<<< HEAD
             <td><%= u.skillValue || 0 %></td>
             <td><%= u.level || 'Beginner' %></td>
             <td><%= (u.badges || []).join(', ') || '-' %></td>
+=======
+>>>>>>> origin/codex/build-full-stack-node.js-web-app-stellamatch-s2xgb2
           </tr>
           <% }) %>
         </tbody>

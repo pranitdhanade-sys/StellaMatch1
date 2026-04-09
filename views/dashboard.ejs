@@ -28,6 +28,10 @@
         <div style="display:flex;justify-content:space-between;align-items:center; gap:10px;">
           <h1 class="hero-title"><%= user.name %></h1>
           <div class="pixel-sprite"></div>
+<<<<<<< HEAD
+=======
+          <div class="sprite-runner"></div>
+>>>>>>> origin/codex/build-full-stack-node.js-web-app-stellamatch-s2xgb2
         </div>
         <p class="stat">CITY: <%= user.city || 'Unknown' %></p>
         <p class="stat">SKILL VALUE: <%= user.skillValue || 0 %> / 100</p>
@@ -107,7 +111,10 @@
 
     <section class="panel" style="margin-top:16px;">
       <h2 class="hero-title" style="font-size:14px;">STELLA TREASURE LEDGER</h2>
+<<<<<<< HEAD
       <h2 class="hero-title" style="font-size:14px;">STELLA POINT LEDGER</h2>
+=======
+>>>>>>> origin/codex/build-full-stack-node.js-web-app-stellamatch-s2xgb2
       <% if (!stellaTransactions.length) { %><p class="subtitle">No point transfers yet.</p><% } %>
       <% stellaTransactions.forEach((tx) => { %>
         <p class="stat">
@@ -159,6 +166,7 @@
       });
     }
   </script>
+<<<<<<< HEAD
   <script src="https://cdn.tailwindcss.com"></script>
   <title>Dashboard | StellaMatch</title>
 </head>
@@ -208,5 +216,7 @@
       </div>
     </div>
   </main>
+=======
+>>>>>>> origin/codex/build-full-stack-node.js-web-app-stellamatch-s2xgb2
 </body>
 </html>

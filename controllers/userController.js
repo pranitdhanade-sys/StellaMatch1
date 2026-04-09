@@ -373,8 +373,14 @@ async function renderLeaderboard(req, res, next) {
       .lean();
 
     const allCities = await User.distinct('city', { city: { $ne: '' } });
+<<<<<<< HEAD
 
     return res.render('leaderboard', { users, sortBy: sortKey, city: city || '', allCities });
+=======
+    const currentUser = await User.findById(req.user.id).select('name xp stellaPoints skillPoints').lean();
+
+    return res.render('leaderboard', { users, sortBy: sortKey, city: city || '', allCities, currentUser });
+>>>>>>> origin/codex/build-full-stack-node.js-web-app-stellamatch-s2xgb2
   } catch (error) {
     return next(error);
   }

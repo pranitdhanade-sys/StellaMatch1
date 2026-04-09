@@ -13,7 +13,13 @@ const sessionSocket = require('./socket/sessionSocket');
 const { startAgenticMatchCron } = require('./services/cronJobs');
 const { seedSkillCatalog } = require('./services/skillCatalog');
 const { seedQuizArena } = require('./services/skillArena');
+<<<<<<< HEAD
 const activityLogger = require('./middleware/activityLogger');
+=======
+const { seedDemoData } = require('./services/demoDataSeeder');
+const activityLogger = require('./middleware/activityLogger');
+const { sessionHintCookie, cacheHeaders, pageCacheMiddleware } = require('./middleware/performance');
+>>>>>>> origin/codex/build-full-stack-node.js-web-app-stellamatch-s2xgb2
 
 const app = express();
 const server = http.createServer(app);
@@ -25,11 +31,21 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
+<<<<<<< HEAD
 app.use(optionalAuth);
 app.use('/public', express.static(path.join(__dirname, 'public')));
 app.use('/resumes', express.static(path.join(__dirname, 'resumes')));
 app.use(activityLogger);
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+=======
+app.use(sessionHintCookie);
+app.use(cacheHeaders);
+app.use(optionalAuth);
+app.use(pageCacheMiddleware());
+app.use('/public', express.static(path.join(__dirname, 'public')));
+app.use('/resumes', express.static(path.join(__dirname, 'resumes')));
+app.use(activityLogger);
+>>>>>>> origin/codex/build-full-stack-node.js-web-app-stellamatch-s2xgb2
 
 app.use(authRoutes);
 app.use(viewRoutes);
@@ -48,6 +64,10 @@ async function start() {
   await connectDB();
   await seedSkillCatalog();
   await seedQuizArena();
+<<<<<<< HEAD
+=======
+  await seedDemoData();
+>>>>>>> origin/codex/build-full-stack-node.js-web-app-stellamatch-s2xgb2
   startAgenticMatchCron();
   server.listen(PORT, () => {
     console.log(`StellaMatch running on http://localhost:${PORT}`);

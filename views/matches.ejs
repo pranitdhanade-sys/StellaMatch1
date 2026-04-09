@@ -50,22 +50,28 @@
       p.className = 'stat';
       p.textContent = `[${new Date(at).toLocaleTimeString()}] ${senderId}: ${message}`;
       feed.prepend(p);
+<<<<<<< HEAD
       if (feed) {
         const p = document.createElement('p');
         p.textContent = `[${new Date(at).toLocaleTimeString()}] ${senderId}: ${message}`;
         feed.prepend(p);
       }
+=======
+>>>>>>> origin/codex/build-full-stack-node.js-web-app-stellamatch-s2xgb2
     });
 
     function sendMessage(roomId) {
       const input = document.getElementById(`msg-${roomId}`);
       if (!input.value.trim()) return;
       socket.emit('session_message', { roomId, message: input.value, senderId: '<%= currentUserId %>' });
+<<<<<<< HEAD
       socket.emit('session_message', {
         roomId,
         message: input.value,
         senderId: '<%= currentUserId %>'
       });
+=======
+>>>>>>> origin/codex/build-full-stack-node.js-web-app-stellamatch-s2xgb2
       input.value = '';
     }
   </script>
