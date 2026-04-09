@@ -95,7 +95,7 @@ async function addProjectGradeToCharacter(req, res, next) {
     const user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ message: 'User not found' });
 
-    const { character, xpAwarded } = await addProjectGrade({ user, title, difficulty, size });
+    const { character, xpAwarded, githubBonus } = await addProjectGrade({ user, title, difficulty, size });
 
     user.xp += xpAwarded;
     user.badges = calculateBadges(user.xp);
@@ -107,7 +107,7 @@ async function addProjectGradeToCharacter(req, res, next) {
       action: 'project_graded',
       method: 'POST',
       path: '/character/project-grade',
-      metadata: { title, difficulty, size, xpAwarded }
+      metadata: { title, difficulty, size, xpAwarded, githubBonus }
     });
 
     return res.redirect('/dashboard');

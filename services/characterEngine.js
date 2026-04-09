@@ -1,4 +1,5 @@
 const Character = require('../models/Character');
+const { analyzeGithub } = require('./githubAnalyzer');
 
 function calculateProjectXp({ difficulty, size }) {
   const difficultyWeight = Math.max(1, Math.min(5, Number(difficulty))) * 20;
@@ -14,7 +15,10 @@ async function ensureCharacterForUser(user) {
       alias: `${user.name.split(' ')[0]}-Ranger`,
       classType: 'Builder',
       sprite: 'sprite-engineer',
-      inventory: ['Starter Keyboard', 'Debug Potion']
+      inventory: ['Starter Keyboard', 'Debug Potion'],
+      level: 1,
+      totalProjectXp: 0,
+      projectGrades: []
     });
   }
   return character;
@@ -22,13 +26,31 @@ async function ensureCharacterForUser(user) {
 
 async function addProjectGrade({ user, title, difficulty, size }) {
   const character = await ensureCharacterForUser(user);
-  const xpAwarded = calculateProjectXp({ difficulty, size });
+  let xpAwarded = calculateProjectXp({ difficulty, size });
+
+  // GitHub bonus
+  let githubBonus = 0;
+  if (user.githubUsername) {
+    try {
+      const githubData = await analyzeGithub(user.githubUsername);
+      const totalCommits = githubData.totalCommits || 0;
+      const totalPRs = githubData.totalPRs || 0;
+      const totalStars = githubData.totalStars || 0;
+      // Bonus based on commits, PRs, stars
+      githubBonus = Math.min(50, Math.floor(totalCommits / 10) + totalPRs * 5 + totalStars * 2);
+      xpAwarded += githubBonus;
+    } catch (error) {
+      console.error('GitHub analysis failed:', error.message);
+      // No bonus if error
+    }
+  }
 
   character.projectGrades.push({
     title,
     difficulty: Number(difficulty),
     size: Number(size),
-    xpAwarded
+    xpAwarded,
+    githubBonus
   });
 
   character.totalProjectXp += xpAwarded;
@@ -39,7 +61,7 @@ async function addProjectGrade({ user, title, difficulty, size }) {
   }
 
   await character.save();
-  return { character, xpAwarded };
+  return { character, xpAwarded, githubBonus };
 }
 
 module.exports = {

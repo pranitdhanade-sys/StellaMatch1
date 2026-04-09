@@ -35,8 +35,8 @@ async function register(req, res, next) {
       skillTags
     } = req.body;
 
-    if (!name || !email || !password) {
-      return res.status(400).json({ message: 'name, email, and password are required.' });
+    if (!name || !email || !password || !githubUsername) {
+      return res.status(400).json({ message: 'name, email, password, and githubUsername are required.' });
     }
 
     const exists = await User.findOne({ email });
