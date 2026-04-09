@@ -8,6 +8,10 @@ const {
   sendStellaPoints,
   sendFriendRequest,
   acceptFriendRequest,
+  renderFriendsHub,
+  sendFriendMessage,
+  renderSkillArena,
+  battleInSkillArena,
   renderCharacterHub,
   renderMatches,
   renderLeaderboard
@@ -26,6 +30,10 @@ router.post('/character/project-grade', requireAuth, addProjectGradeToCharacter)
 router.post('/stella/send', requireAuth, sendStellaPoints);
 router.post('/friends/request', requireAuth, sendFriendRequest);
 router.post('/friends/accept', requireAuth, acceptFriendRequest);
+router.get('/friends-hub', requireAuth, renderFriendsHub);
+router.post('/friends/message', requireAuth, sendFriendMessage);
+router.get('/skill-arena', requireAuth, renderSkillArena);
+router.post('/skill-arena/battle', requireAuth, battleInSkillArena);
 router.get('/character-hub', requireAuth, renderCharacterHub);
 router.get('/matches', requireAuth, renderMatches);
 router.get('/leaderboard', requireAuth, renderLeaderboard);

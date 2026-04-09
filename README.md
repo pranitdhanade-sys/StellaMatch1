@@ -11,6 +11,8 @@ StellaMatch is an AI-powered, gamified skill exchange platform for engineering s
 - Character hub with project grading, XP, and inventory.
 - Stella points transfer ledger in MongoDB.
 - Friend request + accept flow in MongoDB.
+- Friends Hub with direct chat and embedded Jitsi video meet rooms for accepted friends.
+- Skill Testing Arena quiz duels against friends with XP + Stella rewards and battle history.
 - Leaderboard with sorting/filtering by XP, skill points, and Stella points.
 - Activity logging for user actions.
 

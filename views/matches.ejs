@@ -60,6 +60,7 @@
     function sendMessage(roomId) {
       const input = document.getElementById(`msg-${roomId}`);
       if (!input.value.trim()) return;
+      socket.emit('session_message', { roomId, message: input.value, senderId: '<%= currentUserId %>' });
       socket.emit('session_message', {
         roomId,
         message: input.value,

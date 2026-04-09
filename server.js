@@ -12,6 +12,7 @@ const { optionalAuth } = require('./middleware/auth');
 const sessionSocket = require('./socket/sessionSocket');
 const { startAgenticMatchCron } = require('./services/cronJobs');
 const { seedSkillCatalog } = require('./services/skillCatalog');
+const { seedQuizArena } = require('./services/skillArena');
 const activityLogger = require('./middleware/activityLogger');
 
 const app = express();
@@ -46,6 +47,7 @@ const PORT = process.env.PORT || 3000;
 async function start() {
   await connectDB();
   await seedSkillCatalog();
+  await seedQuizArena();
   startAgenticMatchCron();
   server.listen(PORT, () => {
     console.log(`StellaMatch running on http://localhost:${PORT}`);

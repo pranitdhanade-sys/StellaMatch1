@@ -4,10 +4,13 @@ const Skill = require('../models/Skill');
 const ActivityLog = require('../models/ActivityLog');
 const FriendRequest = require('../models/FriendRequest');
 const StellaPointTransaction = require('../models/StellaPointTransaction');
+const FriendMessage = require('../models/FriendMessage');
+const QuizBattle = require('../models/QuizBattle');
 const { calculateLevel, calculateBadges } = require('../services/xpEngine');
 const { findMatches } = require('../services/matchmaker');
 const { resolveSkills } = require('../services/skillCatalog');
 const { ensureCharacterForUser, addProjectGrade } = require('../services/characterEngine');
+const { getArenaQuestions, scoreAnswers } = require('../services/skillArena');
 
 async function renderDashboard(req, res, next) {
   try {
@@ -204,6 +207,134 @@ async function acceptFriendRequest(req, res, next) {
   }
 }
 
+async function renderFriendsHub(req, res, next) {
+  try {
+    const user = await User.findById(req.user.id).populate('friends', 'name city stellaPoints xp').lean();
+    const selectedFriendId = req.query.friend || user.friends?.[0]?._id?.toString() || null;
+
+    let messages = [];
+    let selectedFriend = null;
+    if (selectedFriendId) {
+      selectedFriend = user.friends.find((friend) => String(friend._id) === String(selectedFriendId)) || null;
+      messages = await FriendMessage.find({
+        $or: [
+          { fromUser: req.user.id, toUser: selectedFriendId },
+          { fromUser: selectedFriendId, toUser: req.user.id }
+        ]
+      })
+        .populate('fromUser', 'name')
+        .sort({ createdAt: 1 })
+        .limit(100)
+        .lean();
+    }
+
+    const videoRoom = selectedFriend
+      ? `StellaMatch-${[req.user.id, selectedFriendId].sort().join('-')}`
+      : null;
+
+    return res.render('friendsHub', { user, selectedFriendId, selectedFriend, messages, videoRoom });
+  } catch (error) {
+    return next(error);
+  }
+}
+
+async function sendFriendMessage(req, res, next) {
+  try {
+    const { toUserId, content } = req.body;
+    const user = await User.findById(req.user.id).lean();
+    const isFriend = (user.friends || []).some((friendId) => String(friendId) === String(toUserId));
+    if (!isFriend) return res.status(403).json({ message: 'You can only chat with accepted friends' });
+
+    await FriendMessage.create({ fromUser: req.user.id, toUser: toUserId, content });
+    await ActivityLog.create({
+      user: req.user.id,
+      action: 'friend_message_sent',
+      method: 'POST',
+      path: '/friends/message',
+      metadata: { toUserId }
+    });
+
+    return res.redirect(`/friends-hub?friend=${toUserId}`);
+  } catch (error) {
+    return next(error);
+  }
+}
+
+async function renderSkillArena(req, res, next) {
+  try {
+    const user = await User.findById(req.user.id).populate('friends', 'name').lean();
+    const skill = (req.query.skill || 'javascript').toLowerCase();
+    const questions = await getArenaQuestions(skill, 5);
+    const recentBattles = await QuizBattle.find({
+      $or: [{ challenger: req.user.id }, { opponent: req.user.id }]
+    })
+      .populate('challenger', 'name')
+      .populate('opponent', 'name')
+      .populate('winner', 'name')
+      .sort({ createdAt: -1 })
+      .limit(10)
+      .lean();
+
+    return res.render('skillArena', {
+      user,
+      skill,
+      questions,
+      recentBattles
+    });
+  } catch (error) {
+    return next(error);
+  }
+}
+
+async function battleInSkillArena(req, res, next) {
+  try {
+    const { opponentId, skill } = req.body;
+    const rawAnswers = req.body.answers || {};
+    const answers = Array.isArray(rawAnswers)
+      ? rawAnswers
+      : Object.keys(rawAnswers).sort((a, b) => Number(a) - Number(b)).map((k) => rawAnswers[k]);
+
+    const user = await User.findById(req.user.id);
+    const opponent = await User.findById(opponentId);
+    if (!user || !opponent) return res.status(404).json({ message: 'Player not found' });
+
+    const questions = await getArenaQuestions(String(skill || 'javascript').toLowerCase(), 5);
+    const challengerScore = scoreAnswers(questions, answers);
+    const opponentScore = Math.floor(Math.random() * (questions.length + 1));
+    const winner = challengerScore >= opponentScore ? user : opponent;
+    const xpAwarded = challengerScore * 15;
+    const stellaAwarded = challengerScore >= opponentScore ? 10 : 3;
+
+    user.xp += xpAwarded;
+    user.stellaPoints += stellaAwarded;
+    user.badges = calculateBadges(user.xp);
+    await user.save();
+
+    await QuizBattle.create({
+      challenger: user._id,
+      opponent: opponent._id,
+      skill,
+      scoreChallenger: challengerScore,
+      scoreOpponent: opponentScore,
+      winner: winner._id,
+      xpAwarded,
+      stellaAwarded
+    });
+
+    await ActivityLog.create({
+      user: user._id,
+      action: 'skill_arena_battle',
+      method: 'POST',
+      path: '/skill-arena/battle',
+      metadata: { opponentId, skill, challengerScore, opponentScore, xpAwarded, stellaAwarded }
+    });
+
+    return res.redirect(`/skill-arena?skill=${encodeURIComponent(skill)}`);
+  } catch (error) {
+    return next(error);
+  }
+}
+
 async function renderCharacterHub(req, res, next) {
   try {
     const user = await User.findById(req.user.id).lean();
@@ -267,6 +398,10 @@ module.exports = {
   sendStellaPoints,
   sendFriendRequest,
   acceptFriendRequest,
+  renderFriendsHub,
+  sendFriendMessage,
+  renderSkillArena,
+  battleInSkillArena,
   renderCharacterHub,
   renderMatches,
   renderLeaderboard
