@@ -107,6 +107,7 @@
 
     <section class="panel" style="margin-top:16px;">
       <h2 class="hero-title" style="font-size:14px;">STELLA TREASURE LEDGER</h2>
+      <h2 class="hero-title" style="font-size:14px;">STELLA POINT LEDGER</h2>
       <% if (!stellaTransactions.length) { %><p class="subtitle">No point transfers yet.</p><% } %>
       <% stellaTransactions.forEach((tx) => { %>
         <p class="stat">
@@ -158,5 +159,54 @@
       });
     }
   </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Dashboard | StellaMatch</title>
+</head>
+<body class="bg-slate-100 min-h-screen">
+  <nav class="bg-white shadow p-4 flex gap-4">
+    <a href="/dashboard" class="font-semibold">Dashboard</a>
+    <a href="/profile">Profile</a>
+    <a href="/matches">Matches</a>
+    <a href="/leaderboard">Leaderboard</a>
+    <a href="/logout" class="ml-auto text-red-600">Logout</a>
+  </nav>
+
+  <main class="max-w-6xl mx-auto p-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="bg-white rounded-xl shadow p-5">
+      <h2 class="font-bold text-lg"><%= user.name %></h2>
+      <p>Skill Value: <span class="font-semibold"><%= user.skillValue || 0 %>/100</span></p>
+      <p>Skill Level: <span class="font-semibold"><%= user.level || 'Beginner' %></span></p>
+      <p>XP: <span class="font-semibold"><%= user.xp || 0 %></span></p>
+      <p>Gamified Level: <span class="font-semibold"><%= levelFromXp %></span></p>
+      <div class="mt-2">
+        <% (badges || []).forEach((badge) => { %>
+          <span class="inline-block bg-indigo-100 text-indigo-700 text-xs px-2 py-1 rounded mr-1 mb-1"><%= badge %></span>
+        <% }) %>
+      </div>
+      <div class="mt-4">
+        <div class="h-2 bg-slate-200 rounded">
+          <div class="h-2 bg-indigo-600 rounded" style="width: <%= Math.min(100, (user.xp || 0) % 100) %>%"></div>
+        </div>
+        <p class="text-xs text-slate-500 mt-1">XP progress to next level</p>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow p-5 md:col-span-2">
+      <h3 class="font-semibold text-lg mb-3">Suggested Matches</h3>
+      <% if (!suggested.length) { %>
+        <p class="text-slate-500">No matches yet. Add more skills and come back soon.</p>
+      <% } %>
+      <div class="space-y-3">
+      <% suggested.forEach((m) => { %>
+        <div class="border rounded p-3">
+          <p class="font-medium">Match User ID: <%= m.userB %></p>
+          <p>You can learn: <span class="font-semibold"><%= m.skillRequested %></span></p>
+          <p>You can teach: <span class="font-semibold"><%= m.skillOffered %></span></p>
+          <p class="text-sm text-slate-500">Compatibility: <%= (m.score * 100).toFixed(1) %>%</p>
+        </div>
+      <% }) %>
+      </div>
+    </div>
+  </main>
 </body>
 </html>

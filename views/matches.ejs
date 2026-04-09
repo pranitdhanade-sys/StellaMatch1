@@ -50,12 +50,22 @@
       p.className = 'stat';
       p.textContent = `[${new Date(at).toLocaleTimeString()}] ${senderId}: ${message}`;
       feed.prepend(p);
+      if (feed) {
+        const p = document.createElement('p');
+        p.textContent = `[${new Date(at).toLocaleTimeString()}] ${senderId}: ${message}`;
+        feed.prepend(p);
+      }
     });
 
     function sendMessage(roomId) {
       const input = document.getElementById(`msg-${roomId}`);
       if (!input.value.trim()) return;
       socket.emit('session_message', { roomId, message: input.value, senderId: '<%= currentUserId %>' });
+      socket.emit('session_message', {
+        roomId,
+        message: input.value,
+        senderId: '<%= currentUserId %>'
+      });
       input.value = '';
     }
   </script>

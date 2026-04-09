@@ -32,6 +32,8 @@ async function renderDashboard(req, res, next) {
       .limit(10)
       .lean();
     const recentActivities = await ActivityLog.find({ user: req.user.id }).sort({ createdAt: -1 }).limit(10).lean();
+    const user = await User.findById(req.user.id).populate('character').populate('skillTags').lean();
+    const suggested = await findMatches(req.user.id);
 
     return res.render('dashboard', {
       user,
@@ -41,6 +43,7 @@ async function renderDashboard(req, res, next) {
       incomingFriendRequests,
       stellaTransactions,
       recentActivities
+      suggested
     });
   } catch (error) {
     return next(error);
@@ -375,6 +378,13 @@ async function renderLeaderboard(req, res, next) {
     const allCities = await User.distinct('city', { city: { $ne: '' } });
 
     return res.render('leaderboard', { users, sortBy: sortKey, city: city || '', allCities });
+    const users = await User.find({})
+      .sort({ xp: -1 })
+      .limit(50)
+      .select('name githubUsername xp badges skillValue level')
+      .lean();
+
+    return res.render('leaderboard', { users });
   } catch (error) {
     return next(error);
   }
