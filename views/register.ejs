@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Register | StellaMatch</title>
+</head>
+<body class="bg-slate-100 min-h-screen py-8">
+  <div class="max-w-2xl mx-auto bg-white p-8 rounded-xl shadow">
+    <h1 class="text-2xl font-bold mb-6">Create StellaMatch Account</h1>
+    <form id="registerForm" class="space-y-4" enctype="multipart/form-data">
+      <input class="w-full border rounded p-2" name="name" placeholder="Full Name" required />
+      <input class="w-full border rounded p-2" name="email" type="email" placeholder="Email" required />
+      <input class="w-full border rounded p-2" name="password" type="password" placeholder="Password" required />
+      <input class="w-full border rounded p-2" name="githubUsername" placeholder="GitHub Username" />
+      <input class="w-full border rounded p-2" name="portfolioLink" placeholder="Portfolio URL" />
+      <label class="block text-sm font-medium">Resume (PDF)</label>
+      <input class="w-full border rounded p-2" name="resume" type="file" accept="application/pdf" />
+      <button class="w-full bg-indigo-600 text-white py-2 rounded">Register</button>
+      <p class="text-sm">Already have account? <a class="text-indigo-600" href="/login">Login</a></p>
+      <p id="msg" class="text-sm"></p>
+    </form>
+  </div>
+
+  <script>
+    const form = document.getElementById('registerForm');
+    const msg = document.getElementById('msg');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fd = new FormData(form);
+      const res = await fetch('/register', { method: 'POST', body: fd });
+      const data = await res.json();
+      if (res.ok) {
+        window.location.href = '/dashboard';
+      } else {
+        msg.className = 'text-red-600 text-sm';
+        msg.textContent = data.message || 'Registration failed';
+      }
+    });
+  </script>
+</body>
+</html>
