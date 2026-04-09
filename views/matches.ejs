@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/public/styles.css" />
+  <script src="/socket.io/socket.io.js"></script>
+  <title>StellaMatch :: Realtime Sessions</title>
+</head>
+<body>
+  <nav class="game-nav">
+    <a href="/dashboard">Dashboard</a>
+    <a href="/profile">Profile Lab</a>
+    <a href="/character-hub">Character Hub</a>
+    <a href="/matches">Realtime Sessions</a>
+    <a href="/friends-hub">Guild Chat + Video</a>
+    <a href="/skill-arena">Skill Arena</a>
+    <a href="/leaderboard">Leaderboard</a>
+    <a href="/logout" style="margin-left:auto; color:#ff8686;">Logout</a>
+  </nav>
+
+  <main class="game-shell">
+    <section class="panel">
+      <h1 class="hero-title">PRIVATE 1:1 SESSION CHANNELS</h1>
+      <div class="grid-2">
+        <% matches.forEach((m) => { const peer = String(m.userA._id) === String(currentUserId) ? m.userB : m.userA; %>
+          <div class="panel">
+            <p class="stat">PEER: <%= peer.name %></p>
+            <p class="stat">OFFERS <%= m.skillOffered %> | NEEDS <%= m.skillRequested %></p>
+            <p class="stat">STATUS: <%= m.status %></p>
+            <input id="msg-<%= m._id %>" placeholder="TYPE MESSAGE" />
+            <button type="button" onclick="sendMessage('<%= m._id %>')">SEND</button>
+            <div id="feed-<%= m._id %>" style="max-height:130px; overflow:auto;"></div>
+          </div>
+        <% }) %>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const socket = io();
+    const roomIds = <%- JSON.stringify(matches.map(m => String(m._id))) %>;
+    roomIds.forEach(roomId => socket.emit('join_private_room', { roomId }));
+
+    socket.on('session_message', ({ roomId, message, senderId, at }) => {
+      const feed = document.getElementById(`feed-${roomId}`);
+      if (!feed) return;
+      const p = document.createElement('p');
+      p.className = 'stat';
+      p.textContent = `[${new Date(at).toLocaleTimeString()}] ${senderId}: ${message}`;
+      feed.prepend(p);
+    });
+
+    function sendMessage(roomId) {
+      const input = document.getElementById(`msg-${roomId}`);
+      if (!input.value.trim()) return;
+      socket.emit('session_message', { roomId, message: input.value, senderId: '<%= currentUserId %>' });
+      input.value = '';
+    }
+  </script>
+</body>
+</html>

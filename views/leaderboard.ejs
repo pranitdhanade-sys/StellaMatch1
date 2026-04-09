@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/public/styles.css" />
+  <title>StellaMatch :: Leaderboard</title>
+</head>
+<body>
+  <nav class="game-nav">
+    <a href="/dashboard">Dashboard</a>
+    <a href="/profile">Profile Lab</a>
+    <a href="/character-hub">Character Hub</a>
+    <a href="/matches">Realtime Sessions</a>
+    <a href="/friends-hub">Guild Chat + Video</a>
+    <a href="/skill-arena">Skill Arena</a>
+    <a href="/developer/activity">Developer Activity</a>
+    <a href="/leaderboard">Leaderboard</a>
+    <a href="/logout" style="margin-left:auto; color:#ff8686;">Logout</a>
+  </nav>
+
+  <main class="game-shell">
+
+    <section class="panel" style="margin-bottom:16px;">
+      <h2 class="hero-title" style="font-size:14px;">YOUR HERO PROFILE</h2>
+      <p class="stat">Name: <%= currentUser?.name || 'Unknown' %></p>
+      <p class="stat">XP: <%= currentUser?.xp || 0 %> | Skill Points: <%= currentUser?.skillPoints || 0 %> | Stella: <%= currentUser?.stellaPoints || 0 %></p>
+    </section>
+    <section class="panel">
+      <h1 class="hero-title">TOP 50 CITY ENGINEER PLAYERS</h1>
+      <form method="GET" action="/leaderboard" class="grid-2">
+        <div>
+          <label class="subtitle">SORT BY</label>
+          <select name="sortBy">
+            <option value="xp" <%= sortBy === 'xp' ? 'selected' : '' %>>XP</option>
+            <option value="skillPoints" <%= sortBy === 'skillPoints' ? 'selected' : '' %>>Skill Points</option>
+            <option value="stellaPoints" <%= sortBy === 'stellaPoints' ? 'selected' : '' %>>Stella Points</option>
+          </select>
+        </div>
+        <div>
+          <label class="subtitle">CITY FILTER</label>
+          <select name="city">
+            <option value="">All Cities</option>
+            <% allCities.forEach((cityOption) => { %>
+              <option value="<%= cityOption %>" <%= city === cityOption ? 'selected' : '' %>><%= cityOption %></option>
+            <% }) %>
+          </select>
+        </div>
+        <button type="submit">APPLY FILTERS</button>
+      </form>
+
+      <table class="table">
+        <thead>
+          <tr><th>Rank</th><th>Name</th><th>City</th><th>XP</th><th>Skill Points</th><th>Stella Points</th><th>Skill Value</th><th>Friends</th></tr>
+        </thead>
+        <tbody>
+          <% users.forEach((u, idx) => { %>
+          <tr>
+            <td><%= idx + 1 %></td>
+            <td><%= u.name %></td>
+            <td><%= u.city || '-' %></td>
+            <td><%= u.xp %></td>
+            <td><%= u.skillPoints || 0 %></td>
+            <td><%= u.stellaPoints || 0 %></td>
+            <td><%= u.skillValue || 0 %></td>
+            <td><%= (u.friends || []).length %></td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </section>
+  </main>
+</body>
+</html>
