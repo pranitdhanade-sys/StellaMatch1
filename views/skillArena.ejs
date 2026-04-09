@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/public/styles.css" />
+  <title>StellaMatch :: Skill Arena</title>
+</head>
+<body>
+  <nav class="game-nav">
+    <a href="/dashboard">Dashboard</a>
+    <a href="/friends-hub">Guild Chat + Video</a>
+    <a href="/skill-arena">Skill Arena</a>
+    <a href="/leaderboard">Leaderboard</a>
+    <a href="/logout" style="margin-left:auto; color:#ff8686;">Logout</a>
+  </nav>
+
+  <main class="game-shell">
+    <section class="panel" style="margin-bottom:16px;">
+      <h2 class="hero-title" style="font-size:14px;">PLAYER HUD</h2>
+      <p class="stat">Hero: <%= user.name %></p>
+      <p class="stat">XP: <%= user.xp || 0 %> | Stella: <%= user.stellaPoints || 0 %> | Allies: <%= (user.friends || []).length %></p>
+    </section>
+
+    <section class="grid-2">
+    <section class="panel">
+      <h1 class="hero-title">SKILL TESTING ARENA</h1>
+      <p class="subtitle">Challenge a friend in a quiz duel. Earn XP + Stella coins for victory!</p>
+      <form method="GET" action="/skill-arena">
+        <input name="skill" value="<%= skill %>" placeholder="skill e.g. javascript" />
+        <button type="submit">LOAD QUIZ QUEST</button>
+      </form>
+
+      <form method="POST" action="/skill-arena/battle">
+        <input type="hidden" name="skill" value="<%= skill %>" />
+        <select name="opponentId" required>
+          <option value="">Select Friend Opponent</option>
+          <% (user.friends || []).forEach((friend) => { %>
+            <option value="<%= friend._id %>"><%= friend.name %></option>
+          <% }) %>
+        </select>
+
+        <% questions.forEach((q, idx) => { %>
+          <div class="panel" style="padding:10px; margin-top:10px;">
+            <p class="stat">Q<%= idx + 1 %>: <%= q.question %></p>
+            <% q.options.forEach((option, optIdx) => { %>
+              <label class="stat" style="display:block;">
+                <input type="radio" name="answers[<%= idx %>]" value="<%= optIdx %>" style="width:auto; margin-right:8px;" />
+                <%= option %>
+              </label>
+            <% }) %>
+          </div>
+        <% }) %>
+
+        <button type="submit">BATTLE NOW</button>
+      </form>
+    </section>
+
+    <section class="panel">
+      <h2 class="hero-title" style="font-size:14px;">RECENT DUELS</h2>
+      <% if (!recentBattles.length) { %><p class="subtitle">No battles yet. Start your first duel.</p><% } %>
+      <% recentBattles.forEach((battle) => { %>
+        <div class="panel" style="padding:10px; margin-bottom:10px;">
+          <p class="stat"><%= battle.challenger.name %> vs <%= battle.opponent.name %> [<%= battle.skill %>]</p>
+          <p class="stat">Score: <%= battle.scoreChallenger %> - <%= battle.scoreOpponent %></p>
+          <p class="stat">Winner: <%= battle.winner?.name || 'Draw' %></p>
+          <p class="stat">Rewards: +<%= battle.xpAwarded %> XP, +<%= battle.stellaAwarded %> Stella</p>
+        </div>
+      <% }) %>
+    </section>
+      </section>
+  </main>
+</body>
+</html>
