@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/public/styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <title>StellaMatch :: Dashboard</title>
+</head>
+<body>
+  <nav class="game-nav">
+    <a href="/dashboard">Dashboard</a>
+    <a href="/profile">Profile Lab</a>
+    <a href="/character-hub">Character Hub</a>
+    <a href="/matches">Realtime Sessions</a>
+    <a href="/friends-hub">Guild Chat + Video</a>
+    <a href="/skill-arena">Skill Arena</a>
+    <a href="/leaderboard">Leaderboard</a>
+    <a href="/logout" style="margin-left:auto; color:#ff8686;">Logout</a>
+  </nav>
+
+  <main class="game-shell">
+    <section class="grid-2">
+      <article class="panel">
+        <div style="display:flex;justify-content:space-between;align-items:center; gap:10px;">
+          <h1 class="hero-title"><%= user.name %></h1>
+          <div class="pixel-sprite"></div>
+          <div class="sprite-runner"></div>
+        </div>
+        <p class="stat">CITY: <%= user.city || 'Unknown' %></p>
+        <p class="stat">SKILL VALUE: <%= user.skillValue || 0 %> / 100</p>
+        <p class="stat">SKILL POINTS: <%= user.skillPoints || 0 %></p>
+        <p class="stat">STELLA POINTS: <%= user.stellaPoints || 0 %></p>
+        <p class="stat">SKILL LEVEL: <%= user.level || 'Beginner' %></p>
+        <p class="stat">XP: <%= user.xp || 0 %> | GAMIFIED LVL: <%= levelFromXp %></p>
+        <div class="progress"><span style="width:<%= Math.min(100, (user.xp || 0) % 100) %>%"></span></div>
+        <div style="margin-top:10px;">
+          <% (badges || []).forEach((badge) => { %><span class="badge"><%= badge %></span><% }) %>
+        </div>
+      </article>
+
+      <article class="panel">
+        <h2 class="hero-title" style="font-size:14px;">INTERACTIVE SKILL GRAPH</h2>
+        <canvas id="skillGraph" height="220"></canvas>
+        <p class="subtitle">Skill graph uses your tagged skills + points from MongoDB catalog.</p>
+      </article>
+    </section>
+
+    <section class="grid-2" style="margin-top:16px;">
+      <article class="panel">
+        <h2 class="hero-title" style="font-size:14px;">PROJECT GRADER (CHARACTER XP)</h2>
+        <form method="POST" action="/character/project-grade">
+          <input name="title" placeholder="PROJECT TITLE" required />
+          <label class="subtitle">DIFFICULTY (1-5)</label>
+          <input name="difficulty" type="number" min="1" max="5" value="3" required />
+          <label class="subtitle">SIZE (1-5)</label>
+          <input name="size" type="number" min="1" max="5" value="3" required />
+          <button type="submit">GRADE PROJECT & AWARD XP</button>
+        </form>
+      </article>
+
+      <article class="panel">
+        <h2 class="hero-title" style="font-size:14px;">SEND STELLA POINTS</h2>
+        <form method="POST" action="/stella/send">
+          <input name="toUserId" placeholder="RECEIVER USER ID" required />
+          <input name="points" type="number" min="1" placeholder="POINTS" required />
+          <input name="note" placeholder="NOTE (optional)" />
+          <button type="submit">TRANSFER STELLA POINTS</button>
+        </form>
+      </article>
+    </section>
+
+    <section class="grid-3" style="margin-top:16px;">
+      <article class="panel">
+        <h2 class="hero-title" style="font-size:14px;">FRIENDS</h2>
+        <% if (!(user.friends || []).length) { %><p class="subtitle">No friends yet.</p><% } %>
+        <% (user.friends || []).forEach((friend) => { %>
+          <p class="stat"><%= friend.name %> | XP <%= friend.xp %> | SP <%= friend.stellaPoints %></p>
+        <% }) %>
+        <form method="POST" action="/friends/request" style="margin-top:10px;">
+          <input name="toUserId" placeholder="USER ID TO ADD" required />
+          <button type="submit">SEND FRIEND REQUEST</button>
+        </form>
+      </article>
+
+      <article class="panel">
+        <h2 class="hero-title" style="font-size:14px;">INCOMING REQUESTS</h2>
+        <% if (!incomingFriendRequests.length) { %><p class="subtitle">No pending requests.</p><% } %>
+        <% incomingFriendRequests.forEach((reqRow) => { %>
+          <p class="stat"><%= reqRow.fromUser.name %> (<%= reqRow.fromUser.city || '-' %>)</p>
+          <form method="POST" action="/friends/accept">
+            <input type="hidden" name="requestId" value="<%= reqRow._id %>" />
+            <button type="submit">ACCEPT</button>
+          </form>
+        <% }) %>
+      </article>
+
+      <article class="panel">
+        <h2 class="hero-title" style="font-size:14px;">ACTIVITY LOG</h2>
+        <% recentActivities.forEach((entry) => { %>
+          <p class="stat"><%= new Date(entry.createdAt).toLocaleString() %> :: <%= entry.path %></p>
+        <% }) %>
+      </article>
+    </section>
+
+    <section class="panel" style="margin-top:16px;">
+      <h2 class="hero-title" style="font-size:14px;">STELLA TREASURE LEDGER</h2>
+      <% if (!stellaTransactions.length) { %><p class="subtitle">No point transfers yet.</p><% } %>
+      <% stellaTransactions.forEach((tx) => { %>
+        <p class="stat">
+          <%= tx.fromUser?.name || 'Unknown' %> -> <%= tx.toUser?.name || 'Unknown' %> :
+          <%= tx.points %> points (<%= tx.note || 'no note' %>)
+        </p>
+      <% }) %>
+    </section>
+
+    <section class="panel" style="margin-top:16px;">
+      <h2 class="hero-title" style="font-size:14px;">TOP 5 AGENTIC MATCH SUGGESTIONS</h2>
+      <% if (!suggested.length) { %><p class="subtitle">No suggested matches yet. Add skill tags in profile lab.</p><% } %>
+      <div class="grid-3">
+        <% suggested.forEach((m) => { %>
+          <div class="panel" style="padding:10px;">
+            <div class="sparkle"></div>
+            <p class="stat">USER ID: <%= m.userB %></p>
+            <p class="stat">LEARN: <%= m.skillRequested %></p>
+            <p class="stat">TEACH: <%= m.skillOffered %></p>
+            <p class="stat">SYNC: <%= (m.score * 100).toFixed(1) %>%</p>
+          </div>
+        <% }) %>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const skills = <%- JSON.stringify((user.skillTags || []).map((s) => ({ label: s.displayName || s.name, points: s.points || 0 }))) %>;
+    const labels = skills.map((s) => s.label).slice(0, 10);
+    const data = skills.map((s) => s.points).slice(0, 10);
+
+    const canvas = document.getElementById('skillGraph');
+    if (canvas && labels.length) {
+      new Chart(canvas, {
+        type: 'radar',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Skill Power',
+            data,
+            borderColor: '#52f7d4',
+            backgroundColor: 'rgba(82, 247, 212, 0.2)'
+          }]
+        },
+        options: {
+          plugins: { legend: { labels: { color: '#f8f4ff' } } },
+          scales: { r: { ticks: { color: '#f8f4ff', backdropColor: 'transparent' }, grid: { color: '#58448f' }, pointLabels: { color: '#f8f4ff' } } }
+        }
+      });
+    }
+  </script>
+</body>
+</html>

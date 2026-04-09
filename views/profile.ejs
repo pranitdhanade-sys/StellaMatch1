@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/public/styles.css" />
+  <title>StellaMatch :: Profile Lab</title>
+</head>
+<body>
+  <nav class="game-nav">
+    <a href="/dashboard">Dashboard</a>
+    <a href="/profile">Profile Lab</a>
+    <a href="/character-hub">Character Hub</a>
+    <a href="/matches">Realtime Sessions</a>
+    <a href="/friends-hub">Guild Chat + Video</a>
+    <a href="/skill-arena">Skill Arena</a>
+    <a href="/leaderboard">Leaderboard</a>
+    <a href="/logout" style="margin-left:auto; color:#ff8686;">Logout</a>
+  </nav>
+
+  <main class="game-shell grid-2">
+    <section class="panel">
+      <h1 class="hero-title">PROFILE DATA CORE</h1>
+      <p class="stat">EMAIL: <%= user.email %></p>
+      <p class="stat">CITY: <%= user.city || '-' %></p>
+      <p class="stat">BIO: <%= user.bio || '-' %></p>
+      <p class="stat">PORTFOLIO: <% if (user.portfolioLink) { %><a href="<%= user.portfolioLink %>" target="_blank">OPEN</a><% } else { %>-<% } %></p>
+      <p class="stat">RESUME: <% if (user.resumePath) { %><a href="<%= user.resumePath %>" target="_blank">DOWNLOAD</a><% } else { %>NOT UPLOADED<% } %></p>
+      <p class="stat">CHARACTER LEVEL: <%= user.character?.level || 1 %></p>
+      <p class="stat">CURRENT SKILLS: <%= (user.skills || []).join(', ') || 'none' %></p>
+    </section>
+
+    <section class="panel">
+      <h2 class="hero-title" style="font-size:14px;">UPDATE PROFILE + TAG SKILLS</h2>
+      <form method="POST" action="/profile">
+        <input name="city" placeholder="CITY" value="<%= user.city || '' %>" />
+        <input name="portfolioLink" placeholder="PORTFOLIO LINK" value="<%= user.portfolioLink || '' %>" />
+        <textarea name="bio" rows="4" placeholder="BIO"><%= user.bio || '' %></textarea>
+        <input name="skillTags" placeholder="comma skills..." value="<%= (user.skills || []).join(', ') %>" />
+        <button type="submit">SAVE PROFILE</button>
+      </form>
+      <h3 class="subtitle">SKILL POINT CATALOG</h3>
+      <div style="max-height:220px; overflow:auto;">
+        <% allSkills.forEach((skill) => { %>
+          <p class="stat"><%= skill.displayName %> -> <%= skill.points %> pts</p>
+        <% }) %>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/public/styles.css" />
+  <title>StellaMatch :: Login</title>
+</head>
+<body>
+  <main class="game-shell" style="max-width:760px; padding-top:80px;">
+    <section class="panel">
+      <div style="display:flex; align-items:center; gap:20px;">
+        <div class="pixel-sprite"></div>
+        <div>
+          <h1 class="hero-title">STELLAMATCH TERMINAL</h1>
+          <p class="subtitle">Load your student avatar and enter the skill exchange arcade.</p>
+        </div>
+      </div>
+      <form id="loginForm" style="margin-top:20px;">
+        <input name="email" type="email" placeholder="EMAIL" required />
+        <input name="password" type="password" placeholder="PASSWORD" required />
+        <button type="submit">ENTER ARENA</button>
+        <p class="subtitle">New challenger? <a href="/register">CREATE PROFILE</a></p>
+        <p id="msg" class="subtitle"></p>
+      </form>
+    </section>
+  </main>
+
+  <script>
+    const form = document.getElementById('loginForm');
+    const msg = document.getElementById('msg');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const body = Object.fromEntries(new FormData(form).entries());
+      const res = await fetch('/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      const data = await res.json();
+      if (res.ok) window.location.href = '/dashboard';
+      else msg.textContent = data.message || 'LOGIN FAILED';
+    });
+  </script>
+</body>
+</html>
