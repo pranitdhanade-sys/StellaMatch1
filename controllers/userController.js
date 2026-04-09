@@ -335,6 +335,7 @@ async function renderSkillArena(req, res, next) {
   } catch (error) {
     return next(error);
   }
+}
 
 async function battleInSkillArena(req, res, next) {
   try {
@@ -350,10 +351,14 @@ async function battleInSkillArena(req, res, next) {
     let opponent = null;
     let opponentScore = 0;
     let isRobot = false;
+    let isPractice = false;
 
     if (opponentId === 'robot') {
       isRobot = true;
-      opponentScore = Math.floor(Math.random() * 6); // 0-5
+      opponentScore = Math.floor(Math.random() * 6);
+    } else if (opponentId === 'practice') {
+      isPractice = true;
+      opponentScore = 0;
     } else {
       opponent = await User.findById(opponentId);
       if (!opponent) return res.status(404).json({ message: 'Opponent not found' });
@@ -362,18 +367,23 @@ async function battleInSkillArena(req, res, next) {
 
     const questions = await getArenaQuestions(String(skill || 'javascript').toLowerCase(), 5);
     const challengerScore = scoreAnswers(questions, answers);
-    const winner = challengerScore > opponentScore ? user : (isRobot ? null : opponent);
-    const xpAwarded = challengerScore * 15;
-    const stellaAwarded = challengerScore > opponentScore ? 10 : 3;
+    const xpAwarded = isPractice ? 0 : challengerScore * 15;
+    const stellaAwarded = isPractice ? 0 : challengerScore > opponentScore ? 10 : 3;
+    const won = challengerScore > opponentScore;
+    const winner = won ? user : (isRobot ? null : opponent);
 
-    user.xp += xpAwarded;
-    user.stellaPoints += stellaAwarded;
-    user.badges = calculateBadges(user.xp);
-    await user.save();
+    if (!isPractice) {
+      user.xp += xpAwarded;
+      user.stellaPoints += stellaAwarded;
+      user.badges = calculateBadges(user.xp);
+      await user.save();
+    }
 
     await QuizBattle.create({
       challenger: user._id,
-      opponent: isRobot ? null : opponent._id,
+      opponent: isRobot || isPractice ? null : opponent._id,
+      isRobot,
+      isPractice,
       skill,
       scoreChallenger: challengerScore,
       scoreOpponent: opponentScore,
@@ -387,7 +397,15 @@ async function battleInSkillArena(req, res, next) {
       action: 'skill_arena_battle',
       method: 'POST',
       path: '/skill-arena/battle',
-      metadata: { opponentId: isRobot ? 'robot' : opponentId, skill, challengerScore, opponentScore, xpAwarded, stellaAwarded }
+      metadata: {
+        opponentId: isPractice ? 'practice' : isRobot ? 'robot' : opponentId,
+        skill,
+        challengerScore,
+        opponentScore,
+        xpAwarded,
+        stellaAwarded,
+        mode: isPractice ? 'practice' : isRobot ? 'robot' : 'friend'
+      }
     });
 
     return res.redirect(`/skill-arena?skill=${encodeURIComponent(skill)}`);

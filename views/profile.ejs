@@ -36,6 +36,7 @@
     <section class="panel">
       <h2 class="hero-title" style="font-size:14px;">UPDATE PROFILE + TAG SKILLS</h2>
       <form method="POST" action="/profile">
+        <input name="githubUsername" placeholder="GITHUB USERNAME" value="<%= user.githubUsername || '' %>" required />
         <input name="city" placeholder="CITY" value="<%= user.city || '' %>" />
         <input name="portfolioLink" placeholder="PORTFOLIO LINK" value="<%= user.portfolioLink || '' %>" />
         <textarea name="bio" rows="4" placeholder="BIO"><%= user.bio || '' %></textarea>
